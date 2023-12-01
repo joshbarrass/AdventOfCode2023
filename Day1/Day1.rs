@@ -10,23 +10,36 @@ fn get_input_lines(output: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+const NUMBER_LIST: [&str; 10] = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+
 fn find_number_from_left(line: &String) -> Result<i32, Box<dyn Error>> {
-    for c in line.bytes() {
-        if c >= b'0' && c <= b'9' {
-            return Ok((c - b'0') as i32);
+    for i in 0..line.len() {
+        for n in 0..10 {
+            // dbg!(&line[0..i+1]);
+            if line[0..i+1].contains(&n.to_string()) {
+                return Ok(n);
+            }
+            if line[0..i+1].contains(NUMBER_LIST[n as usize]) {
+                return Ok(n);
+            }
         }
-        
     }
-    Err(format!("No number found in '{}'", line).into())
+    Err(format!("No number found from left in '{}'", line).into())
 }
 
 fn find_number_from_right(line: &String) -> Result<i32, Box<dyn Error>> {
-    for c in line.bytes().rev() {
-        if c >= b'0' && c <= b'9' {
-            return Ok((c - b'0') as i32);
+    for i in (0..line.len()).rev() {
+        for n in 0..10 {
+            // dbg!(&line[i..line.len()]);
+            if line[i..line.len()].contains(&n.to_string()) {
+                return Ok(n);
+            }
+            if line[i..line.len()].contains(NUMBER_LIST[n as usize]) {
+                return Ok(n);
+            }
         }
     }
-    Err(format!("No number found in '{}'", line).into())
+    Err(format!("No number found from right in '{}'", line).into())
 }
 
 fn find_calibration_number(line: &String) -> Result<i32, Box<dyn Error>> {
