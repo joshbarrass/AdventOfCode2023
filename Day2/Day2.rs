@@ -58,14 +58,23 @@ fn parse_line(line: &String) -> Result<Game, Box<dyn Error>> {
     })
 }
 
-fn is_game_possible(game: &Game) -> bool {
-    // "only 12 red cubes, 13 green cubes, and 14 blue cubes"
+type MinCubes = (i32, i32, i32);
+
+fn get_min_possible_cubes(game: &Game) -> MinCubes {
+    let mut max_r = 0;
+    let mut max_g = 0;
+    let mut max_b = 0;
     for reveal in &game.reveals {
-        if reveal.0 > 12 { return false; }
-        if reveal.1 > 13 { return false; }
-        if reveal.2 > 14 { return false; }
+        if reveal.0 > max_r { max_r = reveal.0}
+        if reveal.1 > max_g { max_g = reveal.1}
+        if reveal.2 > max_b { max_b = reveal.2}
     }
-    true
+    (max_r, max_g, max_b)
+}
+
+fn get_power(game: &Game) -> i32 {
+    let min_cubes = get_min_possible_cubes(game);
+    min_cubes.0 * min_cubes.1 * min_cubes.2
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -75,8 +84,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     for line in lines {
         if line.is_empty() { continue; }
         let game = parse_line(line)?;
-        if is_game_possible(&game) { sum += game.id; }
+        sum += get_power(&game);
     }
-    println!("Sum of possible game IDs: {}", sum);
+    println!("Sum of game powers: {}", sum);
     Ok(())
 }
